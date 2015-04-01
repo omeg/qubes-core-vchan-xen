@@ -83,10 +83,14 @@ static int ring_init(struct libvchan *ctrl)
 	if (h == INVALID_HANDLE_VALUE)
 		return -1;
 
+    // This is not needed with Windows GPL PV drivers anymore.
+    // Setting local limit to 1 prevents any other grants because the device instance is reused.
+#ifndef WINNT
 	if (gntmem_set_local_quota(h, 1))
 		goto fail;
 	if (gntmem_set_global_quota(h, GLOBAL_MAX_SHARED_PAGES))
 		goto fail;
+#endif
 
 	memset(grants, 0, sizeof(grants));
 	ring = gntmem_grant_pages_to_domain(h, 0, 1, grants);
